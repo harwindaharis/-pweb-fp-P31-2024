@@ -2,48 +2,89 @@
 import { ref } from "vue";
 import { RouterLink, RouterView } from "vue-router";
 
+// State untuk toggle menu
 const isMenuOpen = ref(false);
-const token = localStorage.getItem("token");
 
+// Ambil token dan role dari localStorage
+const token = localStorage.getItem("token");
+const role = localStorage.getItem("role"); // Role: "admin" atau "user"
+
+// Fungsi untuk toggle menu
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value;
+};
+
+// Fungsi untuk logout
+const handleLogout = () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("role");
+  window.location.href = "/login"; // Redirect ke halaman login
 };
 </script>
 
 <template>
   <nav class="bg-white shadow-md py-6 px-10 flex justify-between items-center">
+    <!-- Logo -->
     <div class="flex items-center">
       <img src="../public/Logonavbar.svg" alt="wcare" class="h-8 mr-4" />
     </div>
+
+    <!-- Navigasi Desktop -->
     <div class="hidden sm:flex flex-1 justify-center space-x-4">
-      <RouterLink to="/" :class="`hover:text-blue-400 font-bold ${$route.path === '/' ? 'text-blue-400' : 'text-gray-700'}`"
-        >Home</RouterLink
+      <RouterLink
+        to="/"
+        :class="`hover:text-blue-400 font-bold ${$route.path === '/' ? 'text-blue-400' : 'text-gray-700'}`"
       >
-      <a href="#feedback" class="text-gray-700 hover:text-blue-400 font-bold"
-        >Feedback</a
+        Home
+      </RouterLink>
+      <a href="#feedback" class="text-gray-700 hover:text-blue-400 font-bold">
+        Feedback
+      </a>
+      <RouterLink
+        to="/news"
+        :class="`hover:text-blue-400 font-bold ${$route.path === '/news' ? 'text-blue-400' : 'text-gray-700'}`"
       >
-      <RouterLink to="/news" :class="`hover:text-blue-400 font-bold ${$route.path === '/news' ? 'text-blue-400' : 'text-gray-700'}`"
-        >News</RouterLink
-      >
+        News
+      </RouterLink>
       <RouterLink
         to="/crowdfund"
         class="text-gray-700 hover:text-blue-400 font-bold"
-        >Crowdfund</RouterLink
       >
+        Crowdfund
+      </RouterLink>
+
+      <!-- Tambahkan link Admin Dashboard jika user adalah admin -->
+      <RouterLink
+        v-if="role === 'admin'"
+        to="/admin"
+        class="text-gray-700 hover:text-blue-400 font-bold"
+      >
+        Admin Dashboard
+      </RouterLink>
     </div>
+
+    <!-- Login/Logout dan Profil -->
     <div class="hidden sm:flex items-center space-x-4">
-      <RouterLink to="/login" v-if="!token">
+      <template v-if="token">
         <button
+          @click="handleLogout"
           class="bg-blue-400 text-white px-4 py-2 rounded-3xl hover:bg-blue-500"
         >
-          Login
+          Logout
         </button>
-      </RouterLink>
-    <RouterLink to="/dashboard" v-else>
-      <img src="../../public/profile.svg" alt="wcare" class=" mr-4 rounded-full" />
-    </RouterLink>
-
+      </template>
+      <template v-else>
+        <RouterLink to="/login">
+          <button
+            class="bg-blue-400 text-white px-4 py-2 rounded-3xl hover:bg-blue-500"
+          >
+            Login
+          </button>
+        </RouterLink>
+      </template>
     </div>
+
+    <!-- Tombol Menu Mobile -->
     <div class="sm:hidden">
       <button @click="toggleMenu" class="text-gray-700 focus:outline-none">
         <svg
@@ -64,6 +105,7 @@ const toggleMenu = () => {
     </div>
   </nav>
 
+  <!-- Navigasi Mobile -->
   <div
     v-if="isMenuOpen"
     class="fixed inset-0 bg-black bg-opacity-50 z-40 sm:hidden transition-opacity duration-300 ease-in-out"
@@ -99,39 +141,59 @@ const toggleMenu = () => {
         to="/"
         :class="`hover:text-blue-400 block font-bold ${$route.path === '/' ? 'text-blue-400' : 'text-gray-700'}`"
         @click="toggleMenu"
-        >Home</RouterLink
       >
+        Home
+      </RouterLink>
       <a
         href="#feedback"
         class="block text-gray-700 hover:text-blue-400"
         @click="toggleMenu"
-        >Feedback</a
       >
+        Feedback
+      </a>
       <RouterLink
         to="/news"
-         :class="`hover:text-blue-400 block font-bold ${$route.path === '/news' ? 'text-blue-400' : 'text-gray-700'}`"
+        :class="`hover:text-blue-400 block font-bold ${$route.path === '/news' ? 'text-blue-400' : 'text-gray-700'}`"
         @click="toggleMenu"
-        >News</RouterLink
       >
+        News
+      </RouterLink>
       <RouterLink
         to="/crowdfund"
         class="block text-gray-700 hover:text-blue-400 font-bold"
         @click="toggleMenu"
-        >Crowdfund</RouterLink
       >
-      <RouterLink to="/login" class="block" v-if="!token">
+        Crowdfund
+      </RouterLink>
+
+      <!-- Link Admin Dashboard untuk mobile -->
+      <RouterLink
+        v-if="role === 'admin'"
+        to="/admin"
+        class="block text-gray-700 hover:text-blue-400 font-bold"
+        @click="toggleMenu"
+      >
+        Admin Dashboard
+      </RouterLink>
+
+      <!-- Tombol Login/Logout -->
+      <button
+        v-if="token"
+        @click="handleLogout"
+        class="block w-full bg-blue-400 text-white px-4 py-2 rounded-3xl hover:bg-blue-500 mt-4"
+      >
+        Logout
+      </button>
+      <RouterLink v-else to="/login" @click="toggleMenu">
         <button
-          class="w-full bg-blue-400 text-white px-4 py-2 rounded-3xl hover:bg-blue-500"
-          @click="toggleMenu"
+          class="block w-full bg-blue-400 text-white px-4 py-2 rounded-3xl hover:bg-blue-500 mt-4"
         >
           Login
         </button>
       </RouterLink>
-      <RouterLink to="/dashboard" v-else @click="toggleMenu">
-        <img src="../../public/profile.svg" alt="wcare" class="mt-6 w-12 h-12 rounded-full" />
-      </RouterLink>
     </div>
   </div>
 
+  <!-- Main Content -->
   <RouterView />
 </template>

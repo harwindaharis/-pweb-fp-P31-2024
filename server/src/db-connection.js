@@ -3,7 +3,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const mongoURI = process.env.DATABASE_URI;
-console.log(mongoURI);
+console.log("Mongo URI:", mongoURI);
 
 if (!mongoURI) {
     console.error("Mongo URI is required");
@@ -11,7 +11,7 @@ if (!mongoURI) {
 }
 
 mongoose
-    .connect(mongoURI)
+    .connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
         console.log("Connected to MongoDB");
     })

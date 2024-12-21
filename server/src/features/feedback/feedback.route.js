@@ -1,36 +1,9 @@
-const express = require("express");
-const router = express.Router();
-const FeedbackService = require("./feedback.service");
+const Crowdfund = require('./crowdfund.model'); // Pastikan file model tersedia
 
-router.post("/feedback", async (req, res) => {
-    try {
-        const feedback = req.body;
-        if (feedback.is_anonymous) {
-            feedback.name = "Anonymous";
-            feedback.email = "anonymous@gmail.com";
-        }
-        const newFeedback = await FeedbackService.createFeedback(feedback);
-        res.status(201).json({
-            status: "success",
-            message: "Feedback created successfully",
-            data: newFeedback,
-        });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-router.get("/feedbacks", async (req, res) => {
-    try {
-        const feedbacks = await FeedbackService.getFeedbacks();
-        res.status(200).json({
-            status: "success",
-            message: "Feedbacks retrieved successfully",
-            data: feedbacks,
-        });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-module.exports = router;
+module.exports = {
+  getAllCrowdfunds: async () => await Crowdfund.find(),
+  getCrowdfundById: async (id) => await Crowdfund.findById(id),
+  createCrowdfund: async (data) => await new Crowdfund(data).save(),
+  updateCrowdfund: async (id, data) => await Crowdfund.findByIdAndUpdate(id, data, { new: true }),
+  deleteCrowdfund: async (id) => await Crowdfund.findByIdAndDelete(id),
+};
